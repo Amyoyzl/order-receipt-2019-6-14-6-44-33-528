@@ -2,7 +2,6 @@ package org.katas.refactoring;
 
 public class OrderReceipt {
     private Order order;
-    private static final double TAXRATE = 0.10;
 
     public OrderReceipt(Order order) {
         this.order = order;
@@ -10,45 +9,33 @@ public class OrderReceipt {
 
     public String printReceipt() {
         StringBuilder output = new StringBuilder();
-        appendHeaders(output);
-        appendOrderData(output);
-        output.append("Sales Tax").append('\t').append(getTotalSalesTax());
-        output.append("Total Amount").append('\t').append(getTotalAmount());
+        output.append(getHeadersString());
+        output.append(getOrderDataString());
+        output.append(getTotalPriceString());
         return output.toString();
     }
 
-    private double getTotalAmount() {
-        double totalAmount = 0d;
-        for (LineItem lineItem : order.getLineItems()) {
-            totalAmount += lineItem.totalAmount() + lineItem.totalAmount() * TAXRATE;
-        }
-        return totalAmount;
+    private String getTotalPriceString() {
+        return "Sales Tax\t" + order.getTotalSalesTax() + "Total Amount\t" + order.getTotalAmount();
     }
 
-    private double getTotalSalesTax() {
-        double totalSalesTax = 0d;
+
+    private String getOrderDataString() {
+        String output = order.getCustomerName() + order.getCustomerAddress();
         for (LineItem lineItem : order.getLineItems()) {
-            totalSalesTax += lineItem.totalAmount() * TAXRATE;
+            output += lineItem.getDescription();
+            output += '\t';
+            output += lineItem.getPrice();
+            output += '\t';
+            output += lineItem.getQuantity();
+            output += '\t';
+            output += lineItem.totalAmount();
+            output += '\n';
         }
-        return totalSalesTax;
+        return output;
     }
 
-    private void appendOrderData(StringBuilder output) {
-        output.append(order.getCustomerName());
-        output.append(order.getCustomerAddress());
-        for (LineItem lineItem : order.getLineItems()) {
-            output.append(lineItem.getDescription());
-            output.append('\t');
-            output.append(lineItem.getPrice());
-            output.append('\t');
-            output.append(lineItem.getQuantity());
-            output.append('\t');
-            output.append(lineItem.totalAmount());
-            output.append('\n');
-        }
-    }
-
-    private void appendHeaders(StringBuilder output) {
-        output.append("======Printing Orders======\n");
+    private String getHeadersString() {
+        return "======Printing Orders======\n";
     }
 }
